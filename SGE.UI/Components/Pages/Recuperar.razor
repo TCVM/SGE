@@ -1,0 +1,24 @@
+@page "/Recuperar"
+@rendermode InteractiveServer
+@using sge.Aplicacion
+@using sge.Repositorios
+@inject CasoDeUsoUsuarioAlta Alta
+@inject NavigationManager menu
+
+<h2>Recuperar Contraseña</h2>
+<form @onsubmit="HandleSubmit">
+    <div class="campo">
+        <label for="nombre">Ingrese Mail</label>
+        <input type="text" id="mail" required />
+    </div>
+    <button type="submit">Enviar al Administrador</button>
+</form>
+
+@code {
+
+    private Task HandleSubmit()
+    {
+        menu.NavigateTo("/");
+        return Task.CompletedTask; 
+    }
+}

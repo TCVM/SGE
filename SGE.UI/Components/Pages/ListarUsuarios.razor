@@ -1,0 +1,87 @@
+@page "/ListarUsuarios"
+@rendermode InteractiveServer
+@inject CasoDeUsoUsuarioListar CasoDeUsoUsuarioListar
+@inject CasoDeUsoUsuarioBaja CasoDeUsoUsuarioBaja
+@inject NavigationManager Navegador
+@inject IJSRuntime JsRuntime;
+
+<h1>Listado de Usuarios</h1>
+
+<DialogoConfirmacion @ref="dialogo" OnConfirmado="Eliminar"/>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Mail</th>
+            <th>Password</th>
+            <th>Permisos</th>
+            <th>¿Administrador?</th>
+            <th>Accion</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in _lista)
+        {
+            <tr>
+                <td>@u.Id</td>
+                <td>@u.Nombre</td>
+                <td>@u.Apellido</td>
+                <td>@u.Mail</td>
+                <td>@u.Password</td>
+                <td>@u.Perm</td>
+                <td>@u.Admin</td>
+                <td>
+                    <button class="btn btn-primary"@onclick="()=>ModificarUsuario(u)">
+                        Modificar
+                    </button>
+                    <button class="btn btn-danger" @onclick="()=> ConfirmarEliminacion(u)">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <button class="btn btn-danger" @onclick="()=> IrAMenu()">
+                        Ir a menu
+    </button>
+</div>
+
+@code {
+    List<Usuario> _lista = new List<Usuario>();
+    protected override void OnInitialized()
+    {
+        _lista = CasoDeUsoUsuarioListar.Ejecutar();
+    }
+
+    DialogoConfirmacion dialogo = null!;
+    Usuario? _UsuarioParaEliminar = null;
+    private void ConfirmarEliminacion(Usuario u)
+    {
+        _UsuarioParaEliminar = u;
+        dialogo.ActualizarMensaje($"¿Desea eliminar al usuario {u.Nombre} {u.Apellido}?");
+        dialogo.Mostrar();
+    }
+    private void Eliminar()
+    {
+        if (_UsuarioParaEliminar != null)
+        {
+            CasoDeUsoUsuarioBaja.Ejecutar(_UsuarioParaEliminar.Id);
+            _lista = CasoDeUsoUsuarioListar.Ejecutar(); //se actualiza la lista de clientes
+        }
+    }
+    void ModificarUsuario(Usuario u)
+    {
+        Navegador.NavigateTo($"ModificarDatos/{u.Id}");
+    }
+
+    void IrAMenu()
+    {
+        Navegador.NavigateTo("/MenuPrincipal");
+    }
+
+}

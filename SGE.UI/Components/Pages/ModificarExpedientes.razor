@@ -1,0 +1,30 @@
+@page "/ModificarExpedientes/{id:int?}"
+@using sge.Repositorios
+@using sge.Aplicacion
+@rendermode InteractiveServer
+@inject NavigationManager menu;
+@inject UsuarioServicioLogin UsuarioServicioLogin
+@inject CasoDeUsoExpedienteModificacion mod
+
+    <input placeholder="caratula" @bind="caratula" class="form-control">
+
+    <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+
+@code {
+    [Parameter] 
+    public int id { get; set; }
+    string caratula="";
+    
+    void Aceptar()
+    {
+          if (caratula != null)
+          {
+              mod.Ejecutar(id, UsuarioServicioLogin.GetUser(), caratula);
+              menu.NavigateTo("/ListarExpedientes");
+          }
+        else
+        {
+            Console.WriteLine("La caratula esta vacia, no se puede modificar.");
+        }
+    }
+}

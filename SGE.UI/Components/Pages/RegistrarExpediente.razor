@@ -1,0 +1,34 @@
+@page "/RegistrarExpediente"
+@rendermode InteractiveServer
+@using sge.Aplicacion
+@using sge.Repositorios
+@inject CasoDeUsoExpedienteAlta Alta
+@inject NavigationManager menu
+@inject UsuarioServicioLogin ServicioLogin
+
+<h2>Registrar Expediente</h2>
+<form @onsubmit="HandleSubmit">
+    <div class="campo">
+        <label for="caratula">Caratula:</label>
+        <input type="text" id="caratula" @bind="e.caratula" required />
+    <button type="submit">Agregar Expediente</button>
+    </div>
+</form>
+
+@code {
+    Expediente e = new Expediente();
+    Usuario? user;
+    private Task HandleSubmit()
+    {
+        user=ServicioLogin.GetUser();
+        if (user == null)
+        {
+            Console.WriteLine("No hay usuario logueado");
+            return Task.CompletedTask;
+        }
+        e.idUsuario= ServicioLogin.recuperarID();
+        Alta.Ejecutar(e,user);
+        menu.NavigateTo("/MenuPrincipal");
+        return Task.CompletedTask;
+    }
+}

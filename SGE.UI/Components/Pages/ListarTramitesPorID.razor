@@ -1,0 +1,116 @@
+@page "/ListarTramitesID/{id:int?}"
+@rendermode InteractiveServer
+@inject CasoDeUsoExpedienteConsultaPorId CasoDeUsoExpedienteConsultaPorId
+@inject UsuarioServicioLogin ServicioLogin;
+@inject NavigationManager menu
+@inject IServicioAutorizacion autorizacion
+@inject CasoDeUsoTramiteBaja CasoDeUsoTramiteBaja
+@inject CasoDeUsoTramiteConsultaPorEtiqueta CasoDeUsoTramiteConsultaPorEtiqueta
+
+<DialogoConfirmacion @ref="dialogo" OnConfirmado="Eliminar" />
+
+    <h1>Lista de tramites por ID</h1>
+    <table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID Expediente</th>
+            <th>Etiqueta</th>
+            <th>Creacion</th>
+            <th>Ult modificacion</th>
+            <th>Ult usuario</th>
+            <th>Contenido</th>
+            <th>Accion</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in _lista)
+        {
+            <tr>
+                <td>@t.Id</td>
+                <td>@t.expedienteId</td>
+                <td>@t.etiqueta</td>
+                <td>@t.creacion</td>
+                <td>@t.modificacion</td>
+                <td>@t.idUltimoUser</td>
+                <td>@t.contenido</td>
+                <td>
+                    <button class="btn btn-primary"@onclick="()=>ModificarTramite(t)">
+                        Modificar
+                    </button>
+                    <button class="btn btn-danger" @onclick="()=> ConfirmarEliminacion(t)">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <button class="btn btn-danger" @onclick="()=> IrAMenu()">
+        Ir a menu
+    </button>
+    <button class="btn btn-danger" @onclick="()=> Atras()">
+        Volver a Expedientes
+    </button>
+</div>
+
+@code {
+[Parameter] 
+    public int id { get; set; }
+    Usuario user= new Usuario();
+
+    Tramite t= new Tramite();
+    List<Tramite> _lista = new List<Tramite>();
+    protected override void OnInitialized()
+    {
+        user= ServicioLogin.GetUser();
+        _lista=CasoDeUsoExpedienteConsultaPorId.Ejecutar(id);
+    }
+
+    void ModificarTramite(Tramite t)
+    {
+        if(autorizacion.poseeElPermiso(user,"TramiteModificacion"))
+            menu.NavigateTo($"ModificarTramite/{t.Id}");
+            else{
+            dialogo.ActualizarMensaje($"No tenes permisos necesarios");
+            dialogo.Mostrar();
+        }
+    }
+
+    private void Eliminar()
+    {
+        if (_TramiteParaEliminar != null)
+        {
+            CasoDeUsoTramiteBaja.Ejecutar(_TramiteParaEliminar.Id, user);
+            _lista = CasoDeUsoTramiteConsultaPorEtiqueta.Ejecutar(_TramiteParaEliminar.etiqueta); //se actualiza la lista de clientes
+        }
+    }
+
+    DialogoConfirmacion dialogo = null!;
+    Tramite? _TramiteParaEliminar = null;
+    private void ConfirmarEliminacion(Tramite t)
+    {
+         if(autorizacion.poseeElPermiso(user,"TramiteBaja")){
+
+            _TramiteParaEliminar = t;
+            dialogo.ActualizarMensaje($"¿Desea eliminar el tramite {t.Id} del expediente {t.expedienteId}?");
+            dialogo.Mostrar();
+        }
+        else{
+            dialogo.ActualizarMensaje($"No tenes permisos necesarios");
+            dialogo.Mostrar();
+        }
+    }
+
+    void IrAMenu()
+    {
+        menu.NavigateTo("/MenuPrincipal");
+    }
+
+    void Atras()
+    {
+        menu.NavigateTo("/ListarExpedientes");
+    }
+}

@@ -1,0 +1,49 @@
+@page "/DialogoConfirmacion"
+@rendermode InteractiveServer
+@using sge.Repositorios
+@using sge.Aplicacion
+@inject NavigationManager menu
+@inject CasoDeUsoIniciarSesion login
+@inject CasoDeUsoUsuarioBuscarPorMail usuario
+
+@if(visible)
+{   
+   <div class="dialogo-contenedor">
+        <div class="dialogo-contenido">
+            <h3>@Mensaje</h3>
+            <button class="btn btn-primary" @onclick="() => Cerrar(true)">Aceptar</button>
+            <button class="btn btn-secondary" @onclick="() => Cerrar(false)">Cancelar</button>
+        </div>
+    </div>
+}
+
+@code {
+    private bool visible = false;
+
+    [Parameter]
+    public string Mensaje { get; set; } = " ";
+
+    [Parameter]
+    public EventCallback OnConfirmado { get; set; }
+
+    public void Mostrar()
+    {
+        visible = true;
+        StateHasChanged(); // sera invocado desde código fuera de este componente,
+    }
+
+  public void ActualizarMensaje(string mensaje)
+    {
+        Mensaje = mensaje;
+        StateHasChanged();
+    }
+
+    void Cerrar(bool confirmar)
+    {
+        visible = false;
+        if (confirmar)
+        {
+            OnConfirmado.InvokeAsync();
+        }
+    }
+}

@@ -1,0 +1,21 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager menu
+
+<div class="linktree-container">
+    <button class="linktree-button" @onclick="InicioSesion">Iniciar sesion</button>
+    <button class="linktree-button" @onclick="Registrar">Registar usuario</button>
+</div>
+
+@code {
+    private void InicioSesion()
+    {
+        menu.NavigateTo("/IniciarSesion");
+    }
+
+    private void Registrar()
+    {
+        menu.NavigateTo("/RegistrarUsuario");
+    }
+
+}

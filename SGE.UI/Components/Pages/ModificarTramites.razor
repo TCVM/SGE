@@ -1,0 +1,30 @@
+@page "/ModificarTramite/{id:int?}"
+@rendermode InteractiveServer
+@using sge.Repositorios
+@using sge.Aplicacion
+@inject NavigationManager menu
+@inject CasoDeUsoTramiteModificacion mod
+@inject UsuarioServicioLogin UsuarioServicioLogin
+
+    <input placeholder="Contenido" @bind="contenido" class="form-control">
+
+    <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+
+@code {
+    [Parameter] 
+    public int id { get; set; }
+    string? contenido;
+
+    void Aceptar()
+    {
+          if (contenido != null)
+          {
+              mod.Ejecutar(id, UsuarioServicioLogin.GetUser(), contenido); 
+              menu.NavigateTo("/ListarTramites");
+          }
+        else
+        {
+            Console.WriteLine("El contenido esta vacio, no se puede modificar");
+        }
+    }
+}

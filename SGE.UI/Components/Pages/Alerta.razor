@@ -1,0 +1,22 @@
+@page "/Alerta"
+<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:@(Mostrar ? "block" : "none")">
+    @Mensaje
+    <button type="button" class="btn-close" aria-label="Close" @onclick="OcultarAlerta"></button>
+</div>
+
+@code {
+    [Parameter] public string Mensaje { get; set; } = "No posees el permiso necesario";
+    public bool Mostrar { get; set; }
+
+    public void MostrarAlerta()
+    {
+        Mostrar = true;
+        StateHasChanged();
+    }
+
+    public void OcultarAlerta()
+    {
+        Mostrar = false;
+        StateHasChanged();
+    }
+}

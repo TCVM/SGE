@@ -1,0 +1,54 @@
+@page "/ModificarDatos/{id:int?}"
+@rendermode InteractiveServer
+@using sge.Repositorios
+@using sge.Aplicacion
+@inject NavigationManager menu
+@inject CasoDeUsoUsuarioModificar mod
+@inject CasoDeUsoUsuarioBuscarPorUsuario buscar
+@inject UsuarioServicioLogin UsuarioServicioLogin
+
+@if (user != null)
+{
+    <input placeholder="Nombre" @bind="user.Nombre" class="form-control">
+    <input placeholder="Apellido" @bind="user.Apellido" class="form-control">
+    <input placeholder="Contraseña" @bind="user.Password" class="form-control">
+    <input placeholder="Permisos" @bind="user.Perm" class="form-control">
+    <input placeholder="Mail" @bind="user.Mail" class="form-control">
+    <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+}
+else
+{
+    <p>Cargando datos del usuario...</p>
+}
+
+@code {
+    [Parameter] 
+    public int? id { get; set; }
+    Usuario? user;
+
+    protected override void OnParametersSet()
+    {
+        if (id.HasValue)
+        {
+            user = buscar.Ejecutar(id.Value);
+        }
+        else
+        {
+            menu.NavigateTo("/ListarUsuarios");
+        }
+    }
+
+    void Aceptar()
+    {
+        if (user != null)
+        {
+            mod.Ejecutar(user);
+            menu.NavigateTo("/ListarUsuarios");
+        }
+        else
+        {
+            // Manejar el caso en que el usuario sea null antes de intentar modificar
+            Console.WriteLine("El usuario es null, no se puede modificar.");
+        }
+    }
+}

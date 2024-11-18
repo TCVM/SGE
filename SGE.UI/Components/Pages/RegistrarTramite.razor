@@ -1,0 +1,52 @@
+@page "/RegistrarTramite"
+@rendermode InteractiveServer
+@using sge.Aplicacion
+@using sge.Repositorios
+@inject CasoDeUsoTramiteAlta Alta
+@inject NavigationManager menu
+@inject UsuarioServicioLogin ServicioLogin
+
+<h2>Registrar Tramite</h2>
+<form @onsubmit="HandleSubmit">
+    <div class="campo">
+        <label for="idExp">ID Expediente:</label>
+        <input type="text" id="idExp" @bind="t.expedienteId" required />
+    </div>
+    <div class="campo">
+        <label for="contenido">Contenido:</label>
+        <input type="text" id="contenido" @bind="t.contenido" required />
+    </div>
+    <div class="campo">
+        <label for="etiqueta">Etiqueta:</label>
+        <select id="etiqueta" @bind="t.etiqueta" required>
+            <option value="" disabled selected>Elige una etiqueta</option>
+            <option value="EscritoPresentado">Escrito presentado</option>
+            <option value="PasaEstudio">Pasa estudio</option>
+            <option value="Despacho">Despacho</option>
+            <option value="Resolucion">Resolución</option>
+            <option value="Notificacion">Notificación</option>
+            <option value="PaseAlArchivo">Pase al archivo</option>
+        </select>
+    </div>
+    <button type="submit">Añadir Tramite</button>
+</form>
+
+@code {
+    Tramite t = new Tramite();
+    Usuario? user;
+    private Task HandleSubmit()
+    {
+     user=ServicioLogin.GetUser();
+         if (user == null)
+        {
+            Console.WriteLine("No hay usuario logueado");
+            return Task.CompletedTask;
+        }
+        if(t.etiqueta==null)
+            t.etiqueta="EscritoPresentado";
+        t.idUltimoUser = ServicioLogin.recuperarID();
+        Alta.Ejecutar(t,user);
+        menu.NavigateTo("/MenuPrincipal");
+        return Task.CompletedTask;
+    }
+}

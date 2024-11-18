@@ -1,0 +1,55 @@
+@page "/IniciarSesion"
+@rendermode InteractiveServer
+@inject NavigationManager navigate;
+@inject CasoDeUsoIniciarSesion CasoDeUsoInicioSesion
+@inject CasoDeUsoUsuarioBuscarPorMail CasoDeUsoBuscarPorMail
+@inject UsuarioServicioLogin UsuarioServicioLogin 
+
+<h1>Inicio</h1>
+
+<div class="container">
+    <h3>Iniciar sesión</h3>
+
+    <p>Ingrese sus credenciales:</p>
+
+    <div >
+        <label for="email">Correo electrónico:</label>
+        <input placeholder="Email" class="form-control" @bind="email" />
+    </div>
+
+    <div >
+        <label for="password">Contraseña:</label>
+        <input placeholder="Contraseña" type="password" id="password" class="form-control" @bind="password" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="IniciarSesion">Iniciar sesión</button>
+
+    <p>Olvide mi contraseña <a href="/Recuperar">Recuperar contraseña</a>.</p>
+</div>
+
+@code{
+
+   private string email=""; 
+   private string password="";
+  void IniciarSesion()
+  {
+    if(CasoDeUsoInicioSesion.Ejecutar(email,password))
+    {
+      Usuario u = CasoDeUsoBuscarPorMail.Ejecutar(email);
+      if(u != null)
+      {
+        UsuarioServicioLogin.SetUser(u);
+        UsuarioServicioLogin.Logueado(); 
+        navigate.NavigateTo("/MenuPrincipal");
+      }
+      else
+      {
+        navigate.NavigateTo("/Error");
+      }
+    }
+    else
+    {
+      navigate.NavigateTo("/Error");
+    }
+  }
+}

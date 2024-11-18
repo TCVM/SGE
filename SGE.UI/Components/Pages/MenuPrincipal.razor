@@ -1,0 +1,81 @@
+﻿@page "/MenuPrincipal"
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@using sge.Repositorios
+@using sge.Aplicacion
+@inject UsuarioServicioLogin ServicioLogin
+@inject NavigationManager menu
+@inject IServicioAutorizacion autorizacion
+
+<Alerta @ref="alerta" />
+
+<h1>Bienvenido @u.Nombre, estas son sus opciones:</h1>
+
+<div class="linktree-container">
+    <button class="linktree-button" @onclick="ListarUsuarios">Listar Usuarios</button>
+    <button class="linktree-button" @onclick="ModificarDatos">Modificar mis datos</button>
+    <button class="linktree-button" @onclick="ListarTramites">Listar Tramites</button>
+    <button class="linktree-button" @onclick="ListarExpedientes">Listar Expedientes</button>
+    <button class="linktree-button" @onclick="RegistrarExpediente">Agregar Expediente</button>
+    <button class="linktree-button" @onclick="RegistrarTramite">Agregar Tramite</button>
+</div>
+
+@code {
+    Usuario u=null!;
+    Alerta alerta = null!;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        u = await Task.FromResult(ServicioLogin.GetUser()); 
+    }
+
+    private void ListarUsuarios()
+    {
+        if(u.Admin)
+            menu.NavigateTo("/ListarUsuarios");
+        else{
+            alerta.MostrarAlerta();
+        }
+    }
+
+    private void ModificarDatos()
+    {
+        menu.NavigateTo("/ModificarDatosUsuario");
+    }
+
+    private void ListarTramites()
+    {
+        if(autorizacion.poseeElPermiso(u,"LecturaGeneral"))
+            menu.NavigateTo("/ListarTramites");
+        else{
+            alerta.MostrarAlerta();
+        }
+    }
+
+    private void ListarExpedientes()
+    {
+        if(autorizacion.poseeElPermiso(u,"LecturaGeneral"))
+            menu.NavigateTo("/ListarExpedientes");
+        else{
+            alerta.MostrarAlerta();
+        }
+    }
+
+    private void RegistrarExpediente()
+    {
+        if(autorizacion.poseeElPermiso(u,"ExpedienteAlta"))
+            menu.NavigateTo("/RegistrarExpediente");
+        else{
+            alerta.MostrarAlerta();
+        }
+    }
+
+    private void RegistrarTramite()
+    {
+        if(autorizacion.poseeElPermiso(u,"TramiteAlta"))
+            menu.NavigateTo("/RegistrarTramite");
+        else{
+            alerta.MostrarAlerta();
+        }
+    }
+}
